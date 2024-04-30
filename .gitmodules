@@ -1,0 +1,3 @@
+[submodule "ConsoleUI"]
+	path = ConsoleUI
+	url = https://github.com/Boothwhack/ConsoleUI
