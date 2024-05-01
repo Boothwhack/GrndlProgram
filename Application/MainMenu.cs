@@ -38,6 +38,16 @@ class MainMenu : IMenu
         },
         new Action
         {
+            Title = "Udregn kontant",
+            Description = """
+                          Udregn hvad der skal betales
+                          tilbage på et køb.
+                          """,
+            ButtonLabel = "Start",
+            OnSelectedDelegate = () => new ChangeMenu()
+        },
+        new Action
+        {
             Title = "Exit",
             Description = """
                           Exit programmet. Farvel og tak for
