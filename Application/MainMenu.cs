@@ -28,6 +28,16 @@ class MainMenu : IMenu
         },
         new Action
         {
+            Title = "Valuta omregner",
+            Description = """
+                          Omregn mellem danske kroner og en
+                          masse forskellige valutaer.
+                          """,
+            ButtonLabel = "Start",
+            OnSelectedDelegate = () => new CurrencyMenu()
+        },
+        new Action
+        {
             Title = "Exit",
             Description = """
                           Exit programmet. Farvel og tak for
