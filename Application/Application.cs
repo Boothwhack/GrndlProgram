@@ -6,9 +6,9 @@ public class Application
 {
     private Screen _screen;
 
-    public Application()
+    public Application(ITerminal terminal)
     {
-        _screen = new Screen([]);
+        _screen = new Screen(terminal);
     }
 
     public void Run()
