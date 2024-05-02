@@ -74,21 +74,27 @@ class MainMenu : IMenu
     {
         _actionSelector = new SelectorWidget(_actions.Select(it => it.Title).ToArray());
         _actionBtn = new ButtonWidget();
-        _actionDescription = new LabelWidget("", 0.0) {MinWidth = 40};
+        _actionDescription = new LabelWidget("", 0.0) { MinWidth = 40 };
 
         UpdateAction();
 
         screen.Elements =
         [
-            new FrameWidget(new LayoutWidget([
-                    _actionSelector,
-                    new SpaceWidget(3),
+            new FrameWidget(
+                new LayoutWidget([
+                    new LabelWidget("Velkommen!\nNavigér med piletasten, og vælg\nmed Enter knappen.", 0.5),
+                    new SpaceWidget(),
                     new LayoutWidget([
-                        _actionDescription,
-                        new SpaceWidget(),
-                        _actionBtn
-                    ], Vec2.Down, 0.0)
-                ], Vec2.Right), Vec2.One,
+                        _actionSelector,
+                        new SpaceWidget(3),
+                        new LayoutWidget([
+                            _actionDescription,
+                            new SpaceWidget(),
+                            _actionBtn
+                        ], Vec2.Down, 0.0)
+                    ], Vec2.Right)
+                ], Vec2.Down),
+                Vec2.One,
                 new Vec2(0.5, 0.5))
         ];
         screen.SetFocusOrder(FocusDirection.Horizontal, [_actionSelector, _actionBtn]);
