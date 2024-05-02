@@ -74,7 +74,7 @@ class MainMenu : IMenu
     {
         _actionSelector = new SelectorWidget(_actions.Select(it => it.Title).ToArray());
         _actionBtn = new ButtonWidget();
-        _actionDescription = new LabelWidget("", 0.0);
+        _actionDescription = new LabelWidget("", 0.0) {MinWidth = 40};
 
         UpdateAction();
 
