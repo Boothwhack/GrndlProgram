@@ -40,7 +40,7 @@ class ChangeMenu : IMenu
                     new Unit { Label = "Hamilton (10$)", Cents = 10_00 },
                     new Unit { Label = "Lincoln (5$)", Cents = 5_00 },
                     new Unit { Label = "Washington (1$)", Cents = 1_00 },
-                    new Unit { Label = "50\u00a2", Cents = 25 },
+                    new Unit { Label = "50\u00a2", Cents = 50 },
                     new Unit { Label = "quarter", Cents = 25 },
                     new Unit { Label = "dime", Cents = 10 },
                     new Unit { Label = "nickel", Cents = 5 },
