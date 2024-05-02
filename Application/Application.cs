@@ -2,7 +2,7 @@ using ConsoleUI;
 
 namespace Application;
 
-class Application
+public class Application
 {
     private Screen _screen;
 
