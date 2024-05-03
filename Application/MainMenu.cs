@@ -70,7 +70,7 @@ class MainMenu : IMenu
         _actionDescription.Label = _selectedAction.Description;
     }
 
-    public void Initialize(Screen screen)
+    public Task Initialize(Screen screen)
     {
         _actionSelector = new SelectorWidget(_actions.Select(it => it.Title).ToArray());
         _actionBtn = new ButtonWidget();
@@ -98,13 +98,15 @@ class MainMenu : IMenu
                 new Vec2(0.5, 0.5))
         ];
         screen.SetFocusOrder(FocusDirection.Horizontal, [_actionSelector, _actionBtn]);
+
+        return Task.CompletedTask;
     }
 
-    public IMenu? Run(Screen screen)
+    public async Task<IMenu?> Run(Screen screen)
     {
         while (true)
         {
-            if (!screen.HandleInput()) continue;
+            if (!await screen.HandleInput()) continue;
 
             if (_actionBtn.Pressed)
                 return _selectedAction.OnSelectedDelegate();

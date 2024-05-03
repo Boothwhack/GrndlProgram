@@ -4,12 +4,12 @@ namespace Application;
 
 class CalculatorMenu : IMenu
 {
-    public void Initialize(Screen screen)
+    public Task Initialize(Screen screen)
     {
         throw new NotImplementedException();
     }
 
-    public IMenu? Run(Screen screen)
+    public async Task<IMenu?> Run(Screen screen)
     {
         throw new NotImplementedException();
     }

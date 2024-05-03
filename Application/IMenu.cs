@@ -4,7 +4,7 @@ namespace Application;
 
 interface IMenu
 {
-    void Initialize(Screen screen);
+    Task Initialize(Screen screen);
 
-    IMenu? Run(Screen screen);
+    Task<IMenu?> Run(Screen screen);
 }

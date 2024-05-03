@@ -2,4 +2,4 @@
 
 var terminal = new ConsoleTerminal();
 var app = new Application.Application(terminal);
-app.Run();
+await app.Run();

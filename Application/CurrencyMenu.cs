@@ -57,24 +57,21 @@ class CurrencyMenu : IMenu
         screen.SetFocusOrder(FocusDirection.Horizontal, [_exitBtn]);
     }
 
-    public void Initialize(Screen screen)
+    public async Task Initialize(Screen screen)
     {
         screen.Elements = [new FrameWidget(new LabelWidget("Indlæser...", 0.5), Vec2.One, new Vec2(0.5, 0.5))];
         screen.SetFocusOrder(FocusDirection.Horizontal, []);
         screen.RefreshScreen();
 
         var httpClient = new HttpClient();
-        var ratesTask = httpClient.GetAsync("https://api.frankfurter.app/latest?from=DKK");
-        ratesTask.Wait();
-        if (ratesTask.Result.StatusCode != HttpStatusCode.OK)
+        var ratesResponse = await httpClient.GetAsync("https://api.frankfurter.app/latest?from=DKK");
+        if (ratesResponse.StatusCode != HttpStatusCode.OK)
         {
             ErrorScreen(screen);
             return;
         }
 
-        var ratesRead = ratesTask.Result.Content.ReadFromJsonAsync<JsonNode>();
-        ratesRead.Wait();
-        var ratesJson = ratesRead.Result;
+        var ratesJson = await ratesResponse.Content.ReadFromJsonAsync<JsonNode>();
         if (ratesJson is null or not JsonObject)
         {
             ErrorScreen(screen);
@@ -88,17 +85,14 @@ class CurrencyMenu : IMenu
             return;
         }
 
-        var currenciesTask = httpClient.GetAsync("https://api.frankfurter.app/currencies");
-        currenciesTask.Wait();
-        if (currenciesTask.Result.StatusCode != HttpStatusCode.OK)
+        var currenciesResponse = await httpClient.GetAsync("https://api.frankfurter.app/currencies");
+        if (currenciesResponse.StatusCode != HttpStatusCode.OK)
         {
             ErrorScreen(screen);
             return;
         }
 
-        var currenciesRead = currenciesTask.Result.Content.ReadFromJsonAsync<JsonNode>();
-        currenciesRead.Wait();
-        var currenciesJson = currenciesRead.Result;
+        var currenciesJson = await currenciesResponse.Content.ReadFromJsonAsync<JsonNode>();
         if (currenciesJson is null or not JsonObject)
         {
             ErrorScreen(screen);
@@ -141,11 +135,11 @@ class CurrencyMenu : IMenu
         UpdateConversion();
     }
 
-    public IMenu? Run(Screen screen)
+    public async Task<IMenu?> Run(Screen screen)
     {
         while (true)
         {
-            if (!screen.HandleInput()) continue;
+            if (!await screen.HandleInput()) continue;
 
             if (_exitBtn.Pressed) return null;
 

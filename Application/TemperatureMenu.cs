@@ -68,7 +68,7 @@ class TemperatureMenu : IMenu
         };
     }
 
-    public void Initialize(Screen screen)
+    public Task Initialize(Screen screen)
     {
         _backBtn = new ButtonWidget { Label = "\u2190" };
         _inputField = new InputFieldWidget(c => char.IsDigit(c) || c == '-', 4, "17");
@@ -101,13 +101,15 @@ class TemperatureMenu : IMenu
         screen.FocusElement(_inputField);
 
         UpdateOutputLabel();
+
+        return Task.CompletedTask;
     }
 
-    public IMenu? Run(Screen screen)
+    public async Task<IMenu?> Run(Screen screen)
     {
         while (true)
         {
-            if (!screen.HandleInput()) continue;
+            if (!await screen.HandleInput()) continue;
 
             if (_backBtn.Pressed) return null;
 

@@ -101,7 +101,7 @@ class ChangeMenu : IMenu
         return output;
     }
 
-    public void Initialize(Screen screen)
+    public Task Initialize(Screen screen)
     {
         _inputField = new InputFieldWidget(c => char.IsDigit(c) || c == ',', contents: "139,50");
         _outputLabel = new LabelWidget("", 0.0);
@@ -127,13 +127,15 @@ class ChangeMenu : IMenu
         screen.FocusElement(_inputField);
 
         UpdateChange();
+        
+        return Task.CompletedTask;
     }
 
-    public IMenu? Run(Screen screen)
+    public async Task<IMenu?> Run(Screen screen)
     {
         while (true)
         {
-            if (!screen.HandleInput()) continue;
+            if (!await screen.HandleInput()) continue;
 
             if (_exitBtn.Pressed) return null;
 

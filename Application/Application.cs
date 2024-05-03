@@ -11,25 +11,25 @@ public class Application
         _screen = new Screen(terminal);
     }
 
-    public void Run()
+    public async Task Run()
     {
-        _screen.DrawThread().Start();
-        PushMenu(new MainMenu());
+        _screen.Draw().Start();
+        await PushMenu(new MainMenu());
         _screen.StopDrawing();
     }
 
-    void PushMenu(IMenu menu)
+    async Task PushMenu(IMenu menu)
     {
         while (true)
         {
-            menu.Initialize(_screen);
+            await menu.Initialize(_screen);
             _screen.RefreshScreen();
 
-            var nextMenu = menu.Run(_screen);
+            var nextMenu = await menu.Run(_screen);
             if (nextMenu is null)
                 break;
 
-            PushMenu(nextMenu);
+            await PushMenu(nextMenu);
         }
     }
 }
