@@ -9,6 +9,8 @@ jobs:
     steps:
       - run: dotnet workload install wasm-tools wasm-tools-net7 wasm-experimental
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - working-directory: WebApp
         run: dotnet publish -c Release -r browser-wasm
       - name: Upload Github Pages artifact
