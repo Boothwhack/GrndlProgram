@@ -1,3 +1,4 @@
+using System.Globalization;
 using ConsoleUI;
 
 namespace Application;
@@ -8,6 +9,7 @@ class ChangeMenu : IMenu
     private InputFieldWidget _inputField;
     private LabelWidget _outputLabel;
     private SelectorWidget _currencySelector;
+    private NumberFormatInfo _numberFormat = new() { NumberDecimalSeparator = "," };
 
     private Dictionary<string, ChangeCurrency> _currencies = new()
     {
@@ -70,7 +72,7 @@ class ChangeMenu : IMenu
 
     private void UpdateChange()
     {
-        if (!double.TryParse(_inputField.Contents, out var input))
+        if (!double.TryParse(_inputField.Contents, _numberFormat, out var input))
         {
             _outputLabel.Label = "N/A";
             return;
@@ -127,7 +129,7 @@ class ChangeMenu : IMenu
         screen.FocusElement(_inputField);
 
         UpdateChange();
-        
+
         return Task.CompletedTask;
     }
 
