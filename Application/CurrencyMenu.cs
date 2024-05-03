@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using ConsoleUI;
 
 namespace Application;
@@ -11,6 +11,16 @@ struct Currency
     public string Label;
     public double Rate;
 }
+
+class CurrencyRatesResponse
+{
+    [JsonPropertyName("rates")]
+    public Dictionary<string, double> Rates { get; set; }
+}
+
+[JsonSerializable(typeof(CurrencyRatesResponse))]
+[JsonSerializable(typeof(Dictionary<string, string>))]
+internal partial class SourceGenerationContext : JsonSerializerContext;
 
 class CurrencyMenu : IMenu
 {
@@ -63,6 +73,11 @@ class CurrencyMenu : IMenu
         screen.SetFocusOrder(FocusDirection.Horizontal, []);
         screen.RefreshScreen();
 
+        var jsonOptions = new JsonSerializerOptions
+        {
+            TypeInfoResolver = SourceGenerationContext.Default
+        };
+
         var httpClient = new HttpClient();
         var ratesResponse = await httpClient.GetAsync("https://api.frankfurter.app/latest?from=DKK");
         if (ratesResponse.StatusCode != HttpStatusCode.OK)
@@ -71,15 +86,8 @@ class CurrencyMenu : IMenu
             return;
         }
 
-        var ratesJson = await ratesResponse.Content.ReadFromJsonAsync<JsonNode>();
-        if (ratesJson is null or not JsonObject)
-        {
-            ErrorScreen(screen);
-            return;
-        }
-
-        var rates = ratesJson["rates"];
-        if (rates is null or not JsonObject)
+        var rates = await ratesResponse.Content.ReadFromJsonAsync<CurrencyRatesResponse>(jsonOptions);
+        if (rates is null)
         {
             ErrorScreen(screen);
             return;
@@ -92,19 +100,17 @@ class CurrencyMenu : IMenu
             return;
         }
 
-        var currenciesJson = await currenciesResponse.Content.ReadFromJsonAsync<JsonNode>();
-        if (currenciesJson is null or not JsonObject)
+        var currencyNames = await currenciesResponse.Content.ReadFromJsonAsync<Dictionary<string, string>>(jsonOptions);
+        if (currencyNames is null)
         {
             ErrorScreen(screen);
             return;
         }
 
         _currencies = new Dictionary<string, Currency>();
-        foreach (var (key, value) in (JsonObject)rates)
+        foreach (var (key, rate) in rates.Rates)
         {
-            if (value is not JsonValue) continue;
-            var name = currenciesJson[key].AsValue().GetValue<string>();
-            var rate = value.AsValue().GetValue<double>();
+            var name = currencyNames[key];
             _currencies[key] = new Currency { Label = name, Rate = rate };
         }
 
