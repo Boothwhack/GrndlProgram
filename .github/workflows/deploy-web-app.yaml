@@ -1,0 +1,30 @@
+name: Deploy WASM web app to Github Pages
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: dotnet workload install wasm-tools wasm-tools-net7 wasm-experimental
+      - uses: actions/checkout@v3
+      - working-directory: WebApp
+        run: dotnet publish -c Release -r browser-wasm
+      - name: Upload Github Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: WebApp/bin/Release/net8.0/browser-wasm/AppBundle
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Github Pages
+        id: deployments
+        uses: actions/deploy-pages@v1
