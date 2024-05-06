@@ -47,6 +47,12 @@ class PensionMenu : IMenu
             return;
         }
 
+        var yearStr = _yearField.Contents;
+        if (yearStr.Length < 4)
+        {
+            _outputLabel.Label = "Indtast et helt årstal (fx. 2000)";
+            return;
+        }
         if (!int.TryParse(_yearField.Contents, out var year))
         {
             _outputLabel.Label = InvalidDateError;
