@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices.JavaScript;
+using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using ConsoleUI;
@@ -31,6 +32,7 @@ class MainThread
 
 class JSTerminal : ITerminal
 {
+    private StringBuilder _buffer = new();
     private const string ESC = "\u001B[";
 
     delegate T MainThreadCall<out T>();
@@ -110,11 +112,21 @@ class JSTerminal : ITerminal
         Write($"{ESC}0m");
     }
 
-    public void SetCursorPosition(int x, int y) => Write($"{ESC}{y};{x}H");
+    public void SetCursorPosition(int x, int y) => Write($"{ESC}{y + 1};{x}H");
+
+    public void Flush()
+    {
+        var text = _buffer.ToString();
+        _buffer.Clear();
+        OnMain(() => TerminalInterop.Write(text));
+    }
 
     public void Clear() => OnMain(TerminalInterop.Clear);
 
-    public void Write(string text) => OnMain(() => TerminalInterop.Write(text));
+    public void Write(string text)
+    {
+        _buffer.Append(text);
+    }
 
     public async Task<ConsoleKeyInfo> ReadKey(bool intercept = false) =>
         await TerminalInterop.KeyChannel.Reader.ReadAsync();
