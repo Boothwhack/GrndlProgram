@@ -48,6 +48,16 @@ class MainMenu : IMenu
         },
         new Action
         {
+            Title = "Pensionsalder",
+            Description = """
+                          Find ud af hvornår du kan søge
+                          om folkepension.
+                          """,
+            ButtonLabel = "Start",
+            OnSelectedDelegate = () => new PensionMenu()
+        },
+        new Action
+        {
             Title = "Exit",
             Description = """
                           Exit programmet. Farvel og tak for
