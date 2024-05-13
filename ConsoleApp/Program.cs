@@ -1,5 +1,7 @@
-﻿using ConsoleUI;
+﻿using Application;
+using ConsoleUI;
 
 var terminal = new ConsoleTerminal();
-var app = new Application.Application(terminal);
+var fs = new FileFileSystem();
+var app = new Application.Application(terminal, fs);
 await app.Run();

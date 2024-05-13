@@ -5,16 +5,18 @@ namespace Application;
 public class Application
 {
     private Screen _screen;
+    private IFileSystem _fs;
 
-    public Application(ITerminal terminal)
+    public Application(ITerminal terminal, IFileSystem fs)
     {
         _screen = new Screen(terminal);
+        _fs = fs;
     }
 
     public async Task Run()
     {
         _screen.Draw().Start();
-        await PushMenu(new MainMenu());
+        await PushMenu(new MainMenu(_fs));
         _screen.StopDrawing();
     }
 

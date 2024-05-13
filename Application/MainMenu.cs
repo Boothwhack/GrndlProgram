@@ -2,7 +2,7 @@ using ConsoleUI;
 
 namespace Application;
 
-class MainMenu : IMenu
+class MainMenu(IFileSystem fs) : IMenu
 {
     struct Action
     {
@@ -55,6 +55,16 @@ class MainMenu : IMenu
                           """,
             ButtonLabel = "Start",
             OnSelectedDelegate = () => new PensionMenu()
+        },
+        new Action
+        {
+            Title = "Persondatabase",
+            Description = """
+                          Database over personer, med
+                          data gemt lokalt.
+                          """,
+            ButtonLabel = "Start",
+            OnSelectedDelegate = () => new PersonDatabaseMenu(fs)
         },
         new Action
         {

@@ -21,7 +21,7 @@ const monoFont = "JetBrains Mono";
 
 const [{setModuleImports, getAssemblyExports, getConfig}] = await Promise.all([loadDotNET(), loadFont(monoFont)]);
 const config = getConfig();
-const exports = await getAssemblyExports(config.mainAssemblyName);
+const {WebApp} = await getAssemblyExports(config.mainAssemblyName);
 
 const terminal = initializeTerminal();
 
@@ -30,15 +30,16 @@ setModuleImports('main.js', {
         write: text => terminal.write(text),
         width: () => terminal.cols,
         height: () => terminal.rows,
-        clear: () => {
-            //terminal.write("\n\n\r");
-            terminal.reset();
-        },
+        clear: () => terminal.reset(),
     },
+    fs: {
+        read: path => localStorage.getItem(path),
+        write: (path, value) => localStorage.setItem(path, value),
+    }
 });
 
 terminal.onKey(e => {
-    exports.TerminalInterop.TerminalKey(e.key, e.domEvent.keyCode);
+    WebApp.JsInterop.TerminalKey(e.key, e.domEvent.keyCode);
 });
 
 await dotnet.run();
