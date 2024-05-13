@@ -1,5 +1,7 @@
 import {dotnet} from './_framework/dotnet.js'
 
+const monoFont = "JetBrains Mono";
+
 function loadFont(fontFamily) {
     return new FontFaceObserver(fontFamily).load();
 }
@@ -13,12 +15,16 @@ function loadDotNET() {
 
 function initializeTerminal() {
     const terminal = new Terminal({fontFamily: monoFont});
-    terminal.open(document.getElementById('terminal'));
+    terminal.open(document.getElementById("terminal"));
+    
+    // remove loading indicator element
+    const loadingIndicator = document.getElementById("loading-indicator");
+    if (loadingIndicator !== null) loadingIndicator.remove();
+    
     return terminal;
 }
 
-const monoFont = "JetBrains Mono";
-
+// wait until dotnet runtime and WebApp module are loaded, and the monospace font has become available.
 const [{setModuleImports, getAssemblyExports, getConfig}] = await Promise.all([loadDotNET(), loadFont(monoFont)]);
 const config = getConfig();
 const {WebApp} = await getAssemblyExports(config.mainAssemblyName);

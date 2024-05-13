@@ -1,4 +1,19 @@
+body {
+    margin: 0;
+    background-color: #1e1e21;
+    color: aliceblue;
+    font-family: sans-serif;
+}
+
+.terminal-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    min-width: fit-content;
+}
+
 #terminal {
     font-family: 'JetBrains Mono', monospace;
-    display: inline-block;
+    box-shadow: 0 0 24px #575757;
 }
