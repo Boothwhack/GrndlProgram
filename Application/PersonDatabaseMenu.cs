@@ -60,7 +60,10 @@ class ConfirmationMenu(
 
 class AlertMenu(string text) : IMenu
 {
+    public delegate IMenu? OnDismissCallback();
+
     private ButtonWidget _dismissBtn = new() { Label = "OK" };
+    public OnDismissCallback OnDismiss = () => null;
 
     public Task Initialize(Screen screen)
     {
@@ -87,7 +90,7 @@ class AlertMenu(string text) : IMenu
         while (true)
         {
             if (!await screen.HandleInput()) continue;
-            if (_dismissBtn.Pressed) return null;
+            if (_dismissBtn.Pressed) return OnDismiss();
         }
     }
 }
@@ -343,27 +346,54 @@ class PersonDatabaseMenu : IMenu
 {
     private IFileSystem _fs;
     private ButtonWidget _backBtn = new() { Label = "\u2190" };
-    private TableWidget _tableWidget = new();
+    private TableWidget _tableWidget;
 
     private const string DbPath = "person-db.txt";
 
-    public PersonDatabaseMenu(IFileSystem fs)
+    private static PersonDatabase DefaultDatabase
+    {
+        get
+        {
+            var database = new PersonDatabase();
+            database.CreatePerson("Karoline Rasmussen", new DateOnly(1999, 12, 20));
+            return database;
+        }
+    }
+
+    private void SaveDatabase()
+    {
+        var writer = _fs.WriteFile(DbPath);
+        PersonDatabase.WriteTo(_tableWidget.Database, writer);
+        writer.Close();
+    }
+
+    public static IMenu LoadDatabaseMenu(IFileSystem fs)
+    {
+        var reader = fs.ReadFile(DbPath);
+        try
+        {
+            var database = reader is null ? DefaultDatabase : PersonDatabase.ReadFrom(reader);
+            return new PersonDatabaseMenu(fs, database);
+        }
+        catch (DatabaseParseException) // database has become corrupt
+        {
+            return new AlertMenu("Databasen er tilsyneladende korrupt.\nEn ny database vil blive skabt.")
+            {
+                OnDismiss = () =>
+                {
+                    // save database immediately to overwrite the corrupted one
+                    var menu = new PersonDatabaseMenu(fs, DefaultDatabase);
+                    menu.SaveDatabase();
+                    return menu;
+                }
+            };
+        }
+    }
+
+    public PersonDatabaseMenu(IFileSystem fs, PersonDatabase database)
     {
         _fs = fs;
-        var reader = _fs.ReadFile(DbPath);
-        if (reader is not null)
-        {
-            _tableWidget.Database = PersonDatabase.ReadFrom(reader);
-            reader.Close();
-        }
-        else
-        {
-            _tableWidget.Database = new PersonDatabase();
-            _tableWidget.Database.CreatePerson("Karoline Rasmussen", new DateOnly(1999, 12, 20));
-            _tableWidget.Database.CreatePerson("Karoline Rasmussen", new DateOnly(1999, 12, 20));
-            _tableWidget.Database.CreatePerson("Karoline Rasmussen", new DateOnly(1999, 12, 20));
-            _tableWidget.Database.CreatePerson("Karoline Rasmussen", new DateOnly(1999, 12, 20));
-        }
+        _tableWidget = new TableWidget { Database = database };
     }
 
     public Task Initialize(Screen screen)
@@ -397,9 +427,7 @@ class PersonDatabaseMenu : IMenu
                     {
                         if (!result) return;
                         _tableWidget.Database.DeletePerson(delete);
-                        var writer = _fs.WriteFile(DbPath);
-                        PersonDatabase.WriteTo(_tableWidget.Database, writer);
-                        writer.Close();
+                        SaveDatabase();
                     }, $"Er du sikker på at du vil\nslette bruger med id '{delete}'?");
             }
 
@@ -408,9 +436,7 @@ class PersonDatabaseMenu : IMenu
                 return new CreatePersonMenu((name, dateOfBirth) =>
                 {
                     _tableWidget.Database.CreatePerson(name, dateOfBirth);
-                    var writer = _fs.WriteFile(DbPath);
-                    PersonDatabase.WriteTo(_tableWidget.Database, writer);
-                    writer.Close();
+                    SaveDatabase();
                 });
             }
 

@@ -64,7 +64,7 @@ class MainMenu(IFileSystem fs) : IMenu
                           data gemt lokalt.
                           """,
             ButtonLabel = "Start",
-            OnSelectedDelegate = () => new PersonDatabaseMenu(fs)
+            OnSelectedDelegate = () => PersonDatabaseMenu.LoadDatabaseMenu(fs)
         },
         new Action
         {
